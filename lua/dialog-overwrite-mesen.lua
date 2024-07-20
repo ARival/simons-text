@@ -1,17 +1,9 @@
-﻿local http = require("socket.http")
+﻿---@diagnostic disable: undefined-global
+local http = require("socket.http")
 local json = require("json")
-local copas = require("copas")
--- print("r: " .. r)
--- print("c: " .. c)
--- print("h: " .. h)
--- emu.displayMessage("outside", "hello there.")
-b, c, h = http.request (
-  "http://localhost:4000/ping"
-)
 
-local data = json.decode(b);
 
-emu.displayMessage('stuff',data.status)
+-- local funkystring = "MAYBE I’LL BAKE*SOMETHING SWEET.*A TREAT FOR ME!*BUT IF I HEAR*A NOISE, I’LL HIDE!/"
 
 function stringToBytes(input)
     local byteTable = {
@@ -39,23 +31,31 @@ end
 
 local dialog_start_address = 0xDCF6
 
-local currentActorID = 0xFF
+CurrentActorID = 0x00
 
-function writeDialog(string)
-    local bytes = stringToBytes(string)
-    for i=1, #bytes do 
-      emu.write(dialog_start_address + i-1, bytes[i], emu.memType.nesPrgRom)
+
+local function writeDialog(actorid)
+    -- local bytes = stringToBytes(actorid)
+    b, c, h = http.request (
+        "http://localhost:4000/dialog?actorid=" .. string.format("%X", actorid)
+    )
+
+    local data = json.decode(b);
+
+    emu.log(type(#data.bytes))
+
+    if (data.status == "error") then
+        emu.displayMessage('error',data.message)
+        return
     end
-b, c, h = http.request (
-  "http://localhost:4000/ping"
-)
 
-local data = json.decode(b);
-
-emu.displayMessage('stuff',data.status)
-
+    for i=1, #data.bytes do 
+    --   emu.log("byte = " .. data.bytes[i])
+      emu.write(dialog_start_address + i-1, data.bytes[i], emu.memType.nesPrgRom)
+    end
 end
 
+local memoryCallbackId = nil
 --function startup()
     -- Speed up the text display
     emu.write(0x1EE9E, 0x01, emu.memType.nesPrgRom)
@@ -64,17 +64,25 @@ end
     --   emu.write(dialog_start_address + i-1, deeznuts_array[i], emu.memType.nesPrgRom)
     -- end
 
-    writeDialog(string)
-
+    -- memory callback for setting current actor id
     emu.addMemoryCallback(function (address, value)
-        if (value == currentActorID) then
+        -- emu.log("Memory Read: " .. value)
+        CurrentActorID = value
+    end, emu.callbackType.write, 0x007F)
+
+    -- memory callback for dialog open
+    memoryCallbackId = emu.addMemoryCallback(function (address, value)
+        emu.log("Memory Write: " .. value)
+        if (value ~= 0xFF) then
             return
         end
-        currentActorID = value
+        -- if (value == currentActorID) then
+        --     return
+        -- end
         -- emu.displayMessage("Memory Write", string.format("Address: %04X, Value: %02X", address, value))
-        emu.displayMessage("Actor ID", "0x" .. string.format("%X", value))
-        writeDialog("ACTOR ID*IS 0X" .. string.format("%X", value) .. "./")
-    end, emu.callbackType.write, 0x007F)
+        emu.log("CurrentActorID: " .. CurrentActorID)
+        writeDialog(CurrentActorID)
+    end, emu.callbackType.write, 0x0027)
 
     -- write chat routine hijack here
     -- LSB
@@ -90,3 +98,10 @@ end
 
 -- Ensure startup is called when the script is loaded
 --emu.addEventCallback(startup, emu.eventType.startFrame)
+
+-- Add a Mesen removeMemoryCallback call to trigger when the script exits
+emu.addEventCallback(function()
+    if memoryCallbackId then
+        emu.removeMemoryCallback(memoryCallbackId)
+    end
+end, emu.eventType.scriptEnded)
