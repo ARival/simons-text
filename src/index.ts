@@ -1,7 +1,7 @@
 import express from "express";
 import fs from 'fs';
 import path from 'path';
-import prompts from "./chatgpt/prompts.json";
+import { prompts } from "./chatgpt/prompts";
 import dotenv from "dotenv";
 import { parseToBytes } from "./chatgpt/parse";
 
@@ -55,17 +55,14 @@ console.log("using system prompt");
 // console.log("systemPrompt", systemPrompt);
 // console.log(parseToBytes("THIS IS A\nSAMPLE TEXT\nFOR THE\nPROMPT RULES."));
 
-// Array of chat prompts
-const chatPrompts = [
-  { actorID: 0x0C, prompt: "Chat prompt 1" },
-  { actorID: "2", prompt: "Chat prompt 2" },
-  { actorID: "3", prompt: "Chat prompt 3" },
-];
-
 // Dictionary to store chat responses
 const chatResponses: { [key: string]: string[] } = {};
 
 async function getActorDialogue(actorID: string) {
+  if (!prompts.actors.hasOwnProperty(actorID as keyof typeof prompts.actors)) {
+    console.error(`Actor ID ${actorID} not found in prompts`);
+    return;
+  } 
   const completion = await openai.chat.completions.create({
     messages: [
       { role: "system", content: systemPrompt },
@@ -82,7 +79,7 @@ const match = regex.exec(completion.choices[0].message.content!);
 
   if (match) {
     // const stringObject = JSON.parse(completion.choices[0].message.content!.replace("/\\N/G", ''));
-    const stringObject = JSON.parse(match[0].replace(/\\N/g, ''));
+    const stringObject = JSON.parse(match[0].replace(/\\N/g, '\\n'));
     return stringObject;
   } else {
     console.error("Failed to parse JSON object from completion");
@@ -146,17 +143,17 @@ app.get("/ping", (req, res) => {
 
 // Endpoint to check if system prompt and chat prompts are completed
 app.get("/status", (req, res) => {
-  const totalPrompts = chatPrompts.length;
-  const completedPrompts = Object.keys(chatResponses).length;
-  const progress = (completedPrompts / totalPrompts) * 100;
+  // const totalPrompts = chatPrompts.length;
+  // const completedPrompts = Object.keys(chatResponses).length;
+  // const progress = (completedPrompts / totalPrompts) * 100;
 
-  if (completedPrompts === totalPrompts) {
-    res.send("System prompt and chat prompts completed successfully");
-  } else {
-    res.send(
-      `System prompt and chat prompts in progress (${progress}% completed)`
-    );
-  }
+  // if (completedPrompts === totalPrompts) {
+  //   res.send("System prompt and chat prompts completed successfully");
+  // } else {
+  //   res.send(
+  //     `System prompt and chat prompts in progress (${progress}% completed)`
+  //   );
+  // }
 });
 
 // Endpoint to get chat responses for a specific actorID
