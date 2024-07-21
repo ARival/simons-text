@@ -4,10 +4,13 @@
   },
   "actors": {
     "38": {
-      "prompt": "Generate 10 Dialogs from a wiseman who is very knowledgeable about the crystals in this world, though he only really has information about the white one. He's seen the curse slowly taking over the town, and has heard of the belmont family, and appreciates their help, but is resentful due to the Belmonts indirectly unleashing the curse upon the land via their actions. Alternate between talking about needing to buy a white crystal in this town, how the white crystal helps see things that are unseen normally, the state of the country after the curse has come, how old he is, how you are not welcome here, or anything related to these subjects."
+      "prompt": "Generate 10 Dialogs from a wiseman who is very knowledgeable about the crystals in this world, though he only really has information about the white one. He's seen the sadness slowly taking over the town due to the monsters roaming the land, and has heard of the belmont family, and appreciates their help, but is resentful due to the Belmonts indirectly unleashing the monsters upon the land via their actions. Alternate between talking about needing to buy a white crystal in this town, how the white crystal helps see things that are unseen normally, the state of the country after the monsters have come, how old he is, how the villagers don't feel you are welcome here, or anything related to these subjects."
     },
     "4C": {
       "prompt": "Generate 10 Dialogs from an old man who is randomly rambles about people being in cahoots with Dracula. He will reply with imagined behaviors of people in town, how people will deceive you, how dracula is driving people insane, or anything related to these subjects."
+    },
+    "31": {
+      "prompt": "Generate 10 Dialogs from a priest in the church. The priest is very kind, and geniuinely cares about the villagers. He is familiar with the Belmont family, and is sympathetic to the curse that has befallen Simon. He will talk about the curse, the belmont family, the church, the town, the difficulty in healing villagers hurt by monsters, the demons that roam at night, or anything related to these subjects."
     }
   }
 }

@@ -80,7 +80,7 @@ local memoryCallbackId = nil
         --     return
         -- end
         -- emu.displayMessage("Memory Write", string.format("Address: %04X, Value: %02X", address, value))
-        emu.log("CurrentActorID: " .. CurrentActorID)
+        emu.log("CurrentActorID: " .. string.format("%X", CurrentActorID))
         writeDialog(CurrentActorID)
     end, emu.callbackType.write, 0x0027)
 

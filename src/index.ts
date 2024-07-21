@@ -53,7 +53,7 @@ const systemPrompt = prompts.system.prompt;
 
 console.log("using system prompt");
 // console.log("systemPrompt", systemPrompt);
-console.log(parseToBytes("THIS IS A\nSAMPLE TEXT\nFOR THE\nPROMPT RULES."));
+// console.log(parseToBytes("THIS IS A\nSAMPLE TEXT\nFOR THE\nPROMPT RULES."));
 
 // Array of chat prompts
 const chatPrompts = [
@@ -74,11 +74,20 @@ async function getActorDialogue(actorID: string) {
     model: "gpt-4o",
   });
 
-  const stringObject = JSON.parse(completion.choices[0].message.content!);
-  console.log(stringObject);
-  console.log("first object:", stringObject[0]);
-  return stringObject;
+  console.log("completion:", completion.choices[0].message.content);
 
+  
+const regex = /\[(?:[^[\]]|\[(?:[^[\]]|\[[^[\]]*\])*\])*\]/s;
+const match = regex.exec(completion.choices[0].message.content!);
+
+  if (match) {
+    // const stringObject = JSON.parse(completion.choices[0].message.content!.replace("/\\N/G", ''));
+    const stringObject = JSON.parse(match[0].replace(/\\N/g, ''));
+    return stringObject;
+  } else {
+    console.error("Failed to parse JSON object from completion");
+    return;
+  }
 }
 
 app.get("/dialog", async (req, res) => {
@@ -90,6 +99,10 @@ app.get("/dialog", async (req, res) => {
   if (!dialogStorage.hasOwnProperty(actorID)) {
     try {
       const dialogArray = await getActorDialogue(actorID);
+      if (!dialogArray) {
+        res.status(500).json({ message: "Failed to fetch dialog", status: "error" });
+        return;
+      }
       dialogStorage[actorID] = {
         dialog: dialogArray,
         dialogCounter: 0
