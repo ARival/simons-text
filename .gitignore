@@ -130,4 +130,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# dialogue cache
 src/dialogStorage.json
+
+# Mac Stuff
+.DS_Store
