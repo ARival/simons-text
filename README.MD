@@ -46,6 +46,9 @@ Prompts.ts contains prompts for each of the actors in the game's first town of J
 
 Anything is fine! I plan on finishing up the prompts, so maybe some contributions to that could help. Also, the dialog often flows out of the bounds of the textbox; I'll fix that someday if someone else doesn't.
 
+## Special Thanks
+Got a ton of help from the folks over at the [Castlevania 2 Randomizer Project](https://github.com/kaelari/cv2r/wiki); it would've taken a LOT longer to do it without them.
+
 ## License
 
 Simon's Text is licensed under the [MIT License](https://opensource.org/licenses/MIT).
