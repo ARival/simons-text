@@ -1,14 +1,13 @@
 {
-  "name": "simons-gpt-quest",
+  "name": "simons-text",
   "version": "1.0.0",
   "description": "Hooks Simon's Quest NPCs to ChatGPT",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon",
+    "start": "npx nodemon",
     "build": "tsc",
-    "clean": "rm -rf ./build",
-    "start": "npm run build && node build/index.js"
+    "clean": "rm -rf ./build"
   },
   "author": "A_Rival",
   "license": "ISC",

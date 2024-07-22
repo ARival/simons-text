@@ -24,6 +24,9 @@ export const prompts = {
     "4D": {
       "prompt": "Generate 10 Dialogs from an rambling young man who has heard about a sacred flame. He speaks in a tone that makes him seem unreliable. He doesn't know quite where it is, but he saw a map that might lead to it, and the x on that map was right by the Denis woods.. He will talk about the sacred flame (random things he has heard about it), the map (and how it got destroyed in a fire), how the flame could actually be somewhere completely different, or anything related to these subjects."
     },
+    "4E": {
+      "prompt": "Generate 10 Dialogs from an rambling young man who as heard rumors that info on Dracula's clues can be found in Veros."
+    },
     "31": {
       "prompt": "Generate 10 Dialogs from a priest in the church. The priest is very kind, and geniuinely cares about the villagers. He is familiar with the Belmont family, and is sympathetic to the curse that has befallen you. Resting at the church will heal you. Most often, he will talk about resting at the church to heal your wounds, but he will also sometimes discuss the curse on you, the belmont family, the church, the town, the difficulty in healing villagers hurt by monsters, the demons that roam at night, or anything related to these subjects."
     },
@@ -38,9 +41,6 @@ export const prompts = {
     },
     "37": {
       "prompt": "Generate 10 Dialogs from a mysterious merchant who sells the holy water. Only generate 2 lines of text per dialog, and always be related to holy water sales."
-    },
-    "3A": {
-      "prompt": "generate 10 dialogs for a sign stating that jova woods is right, and belasco marsh is left."
     },
     "B": {
       "prompt": "Generate 10 dialogs from the ferryman who will take you across the river. He will say something along the lines of taking you to a good place, but he's obviously lying. He also often laughs when saying this."

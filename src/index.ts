@@ -35,14 +35,8 @@ const dialogStorage = loadDialogStorage();
 
 dotenv.config();
 
-const byteArray = [
-  20,   8,  9, 19,  0,  9, 19,  0,  1, 254,
-  19,   1, 13, 16, 12,  5,  0, 20,  5,  24,
-  20, 254,  6, 15, 18,  0, 20,  8,  5, 254,
-  16,  18, 15, 13, 16, 20,  0, 18, 21,  12,
-   5,  19, 27, 255
-];
 
+// Initialize the OpenAI API
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const app = express();
@@ -52,13 +46,11 @@ const port = 4000;
 const systemPrompt = prompts.system.prompt;
 
 console.log("using system prompt");
-// console.log("systemPrompt", systemPrompt);
-// console.log(parseToBytes("THIS IS A\nSAMPLE TEXT\nFOR THE\nPROMPT RULES."));
 
-// Dictionary to store chat responses
-const chatResponses: { [key: string]: string[] } = {};
-
-async function getActorDialogue(actorID: string) {
+// Function to send a chat prompt to OpenAI
+// we use gpt-4o here, but other models may work.
+// I found it to be the most consistent with the NES constraints.
+async function getActorDialog(actorID: string) {
   if (!prompts.actors.hasOwnProperty(actorID as keyof typeof prompts.actors)) {
     console.error(`Actor ID ${actorID} not found in prompts`);
     return;
@@ -90,12 +82,9 @@ const match = regex.exec(completion.choices[0].message.content!);
 app.get("/dialog", async (req, res) => {
   const actorID = req.query.actorid as string;
 
-  // res.json({message: "hello", bytes: byteArray, status: "success"});
-  // return;
-
   if (!dialogStorage.hasOwnProperty(actorID) || !dialogStorage[actorID].dialog) {
     try {
-      const dialogArray = await getActorDialogue(actorID);
+      const dialogArray = await getActorDialog(actorID);
       if (!dialogArray) {
         res.status(500).json({ message: "Failed to fetch dialog", status: "error" });
         return;
@@ -118,7 +107,7 @@ app.get("/dialog", async (req, res) => {
     res.json({ message: dialog, bytes: parseToBytes(dialog), status: "success" });
     if (dialogStorage[actorID].dialogCounter >= dialogStorage[actorID].dialog.length) {
       dialogStorage[actorID].dialogCounter = 0;
-      const dialogArray = await getActorDialogue(actorID);
+      const dialogArray = await getActorDialog(actorID);
       dialogStorage[actorID] = {
         dialog: dialogArray,
         dialogCounter: 0
@@ -126,6 +115,19 @@ app.get("/dialog", async (req, res) => {
     }
   }
   saveDialogStorage(dialogStorage);
+});
+
+// Endpoint to check if the passed actorID is in prompts.ts
+app.get("/actors", (req, res) => {
+  const actorID = req.query.actorid as string;
+  console.log("actorID", actorID);
+  if (prompts.actors.hasOwnProperty(actorID as keyof typeof prompts.actors)) {
+    console.log("actorID found");
+    res.status(200).send("success");
+  } else {
+    console.log("actorID NOT found");
+    res.status(404).json({ message: "Actor ID not found", status: "error" });
+  }
 });
 
 console.log("Sending system prompt");
@@ -141,34 +143,14 @@ app.get("/ping", (req, res) => {
   , 1000);
 });
 
-// Endpoint to check if system prompt and chat prompts are completed
-app.get("/status", (req, res) => {
-  // const totalPrompts = chatPrompts.length;
-  // const completedPrompts = Object.keys(chatResponses).length;
-  // const progress = (completedPrompts / totalPrompts) * 100;
-
-  // if (completedPrompts === totalPrompts) {
-  //   res.send("System prompt and chat prompts completed successfully");
-  // } else {
-  //   res.send(
-  //     `System prompt and chat prompts in progress (${progress}% completed)`
-  //   );
-  // }
-});
-
-// Endpoint to get chat responses for a specific actorID
-app.post("/responses", express.json(), (req, res) => {
-  const actorID = req.body.actorID;
-  const responses = chatResponses[actorID] || [];
-
-  res.json(responses);
-});
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+// TODO: Implement "pre-baking" of chat prompts
+// ie. generate all chat prompts on launch and store them in dialogStorage
 // Send chat prompts on server startup
 // chatPrompts.forEach((chatPrompt) => {
 //   sendChatPrompt(chatPrompt.actorID, chatPrompt.prompt);
