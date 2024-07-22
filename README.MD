@@ -1,6 +1,6 @@
 # Simon's Text
 
-Simon's Text is a proof-of-concept project that enhances the in-game text of the classic NES game Simon's Quest by replacing it with infinite text generated from ChatGPT. So far, only the 1st town of Jova is completed. This was inspired by [a talk Neal Stephenson had about some AI NPCs.](https://youtu.be/6ip3E-HuabE?si=cA7PVWm5Toykc3wd)
+Simon's Text is a proof-of-concept project which generates and replaces dialog of the classic NES game Simon's Quest with infinite text generated from ChatGPT **in real time**. So far, only the 1st town of Jova is completed. This was inspired by [a talk Neal Stephenson had about some AI NPCs.](https://youtu.be/6ip3E-HuabE?si=cA7PVWm5Toykc3wd)
 
 ![Simon's Text](images/image.png) ![Simon's Text](images/image2.png) ![Simon's Text](images/image3.png)
 
