@@ -93,7 +93,7 @@ app.get("/dialog", async (req, res) => {
   // res.json({message: "hello", bytes: byteArray, status: "success"});
   // return;
 
-  if (!dialogStorage.hasOwnProperty(actorID)) {
+  if (!dialogStorage.hasOwnProperty(actorID) || !dialogStorage[actorID].dialog) {
     try {
       const dialogArray = await getActorDialogue(actorID);
       if (!dialogArray) {
