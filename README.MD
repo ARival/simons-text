@@ -21,7 +21,7 @@ Documentation: [OpenAI API Access](https://help.openai.com/en/articles/7039783-h
 To install Simon's Text, follow these steps:
 
 1. Clone the repository to your local machine.
-2. Install LuaSocket; try LuaRocks!
+2. Install LuaSocket; try LuaRocks! If you're on Windows, [you may need the precompiled version.](https://github.com/alain-riedinger/luasocket/releases). If so, unzip this into a folder named 'lua' inside of your Mesen directory.
 3. Install Node.js and its prerequisites if you haven't already.
 4. Obtain a copy of a CLEAN Simon's Quest NES ROM somehow (don't tell me how you did it).
 
@@ -32,8 +32,8 @@ To use Simon's Text, follow these instructions:
 1. Add your api key to a `.env` file in the root
 2. Run the Node.js server with `npm run start`
 3. Launch the Mesen Emulator.
-4. Open the script window and load `dialog-overwrite-mesen.lua` 
-5. Load the Simon's Quest NES ROM.
+4. Load the Simon's Quest NES ROM.
+5. Open the script window and load `dialog-overwrite-mesen.lua` NOTE: you will need to enable OS Functions and network access under settings, along with increasing max script execution time to around 5 seconds. 
 6. Enjoy the game with dynamically generated text!
 
 # How it works
