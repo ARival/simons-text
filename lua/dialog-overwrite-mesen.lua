@@ -41,7 +41,7 @@ local function writeDialog(actorid)
 end
 
 -- Uncomment this to Speed up the text display
--- emu.write(0x1EE9E, 0x02, emu.memType.nesPrgRom)
+emu.write(0x1EE9E, 0x02, emu.memType.nesPrgRom)
 
 -- memory callback for when the actor id is written
 -- we store it in a global variable so we can use it later

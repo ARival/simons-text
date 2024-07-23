@@ -44,6 +44,9 @@ export const prompts = {
     },
     "B": {
       "prompt": "Generate 10 dialogs from the ferryman who will take you across the river. He will say something along the lines of taking you to a good place, but he's obviously lying. He also often laughs when saying this."
+    },
+    "C": {
+      "prompt": "Generate 10 dialogs from the ferryman who will take you across the river. He can can sense that you have Dracula's heart, and will take you to the actual place you need to go to complete your quest. He refers to Dracula's heart ambiguously."
     }
   }
 }
