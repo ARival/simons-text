@@ -12,12 +12,20 @@
         <h3>Simon's Text Admin Panel</h3>
       </div>
       <div>
-        <a href="#">test</a>
-        <a href="#">test</a>
-        <a href="#">test</a>
+        <a href="https://github.com/ARival/simons-text" target="_blank"><img style="width: 1.5rem;" src="./images/github-mark-white.svg" alt="project github"/></a>
       </div>
     </nav>
     <div id="main">
+      <div class="form-item form-item-max">
+        <h3 style="margin: 0">Actor Dialog Viewer</h3>
+        <select class="form-select" id="actor-select" onchange="actorChange()">
+        </select>
+        <div id="form-dialog-display">
+          Select a character to view their dialog.
+        </div>
+        <!-- <button id="clear-cache-button">Clear Cache</button>
+        <span id="progressText">Removes all cached dialog.</span> -->
+      </div>
       <div class="form-item">
         <button id="preloadButton">Preload Dialog</button>
         <div id="preload-container">
@@ -30,16 +38,6 @@
       <div class="form-item">
         <button id="clear-cache-button">Clear Cache</button>
         <span id="progressText">Removes all cached dialog.</span>
-      </div>
-      <div class="form-item">
-        <h3 style="margin: 0">Actor Dialog Viewer</h3>
-        <select class="form-select" id="actor-select" onchange="actorChange()">
-        </select>
-        <div id="form-dialog-display">
-          Select a character to view their dialog.
-        </div>
-        <!-- <button id="clear-cache-button">Clear Cache</button>
-        <span id="progressText">Removes all cached dialog.</span> -->
       </div>
     </div>
   </div>

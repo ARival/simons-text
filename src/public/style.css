@@ -53,19 +53,21 @@ a {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 1rem;
-  height: calc(100vh - 48px);
+  min-height: 100vh;
 }
 
 #header {
   width: 100%;
   height: 48px;
-  background-color: var(--progress-bar-bg-color);
+  background-color: var(--background-color);
   display: flex;
   padding: 1rem;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px var(--button-bg-color) solid;
 }
 
 #main {
@@ -94,6 +96,10 @@ a {
   border-radius: 1rem;
   min-width: 328px;
   flex: 1;
+}
+
+.form-item-max {
+  flex: 100%;
 }
 
 #progressText {
@@ -146,6 +152,7 @@ select {
   padding: 1rem;
   border: 4px blue solid;
   border-radius: 8px;
+  line-height: 2.5;
 }
 
 @font-face {
