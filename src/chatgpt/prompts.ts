@@ -3,14 +3,11 @@ export const prompts = {
     "prompt": "We will generate text within these very strict boundaries:\n\n- Characters per line: 12 characters (spaces count toward this limit).\n- Lines per dialog box: Anywhere from 2 lines to 5 lines, with 5 lines being the maximum.\n- Max characters per dialog interaction: 60 characters.\n- Manual carriage returns: Necessary after each line to maintain the format within the 12-character limit per line.\n- Case: All upper case letters.\n- Prose: A single statement from a single in-game character about the presented subject.\n- Sets: Each generated dialog will be a single isolated instance adhering to these rules. Generate multiple only when asked.\n\nExample Output Format:\n\n[\n  \"THIS IS A\\nSAMPLE TEXT\\nFOR THE\\nPROMPT RULES.\",\n  \"ANOTHER TEXT\\nTO DEMONSTRATE\\nFORMATTING.\"\n]\n\nImportant Notes:\n\n- You don’t have to adhere to these rules when speaking to me; they apply only to the dialogs we generate.\n- All dialogs will take place in the universe of Castlevania: Simon's Quest for the NES."
   },
   "actors": {
-    "0": {
-      "prompt": "Generate 10 permutations of the term 'what a horrible night to have a curse.'"
-    },
     "38": {
       "prompt": "Generate 10 Dialogs from a wiseman who is very knowledgeable about the crystals in this world, though he only really has information about the white one. He's seen the sadness slowly taking over the town due to the monsters roaming the land, and has heard of the belmont family, and appreciates their help, but is resentful due to the Belmonts indirectly unleashing the monsters upon the land via their actions. Alternate between talking about needing to buy a white crystal in this town, how the white crystal helps see things that are unseen normally, the state of the country after the monsters have come, how old he is, how the villagers don't feel you are welcome here, or anything related to these subjects."
     },
     "3D": {
-      "prompt": "Generate 10 Dialogs from a wiseman who has info that someone in the town of Aldra will play a very important role in your quest, and how you must find him. He also knows that this person also hunts the supernatural, and is part of a guild of hunters. He also knows that this person might be looking for an artifact or magic item. He will talk to you about anything related to these subjects."
+      "prompt": "Generate 10 Dialogs from a wiseman who has info that someone in the town of Aljiba will play a very important role in your quest, and how you must find him. He also knows that this person also hunts the supernatural, and is part of a guild of hunters. He also knows that this person might be looking for an artifact or magic item. He will talk to you about anything related to these subjects."
     },
     "3E": {
       "prompt": "Generate 10 Dialogs from a wiseman who knows about the 13 clues of dracula, a collection of 13 books which contain the secrets to defeating dracula. He knows these books are hidden in false walls all throughout your adventure, though he isn't sure what they contain. He will talk about the clues, how they can help you, how they can be found, or anything related to these subjects."
@@ -47,6 +44,18 @@ export const prompts = {
     },
     "C": {
       "prompt": "Generate 10 dialogs from the ferryman who will take you across the river. He can can sense that you have Dracula's heart, and will take you to the actual place you need to go to complete your quest. He refers to Dracula's heart ambiguously."
+    },
+    "40": {
+      "prompt": "Generate 10 dialogs from a scholar who tells you Dracula's body parts have magical powers. He isn't sure about his information, but will talk about the body parts even though he does not know specifically which ones exists, how some of his parts can shield you from evil, how this information comes from ancient texts, or anything related to these subjects."
+    },
+    "43": {
+      "prompt": "Generate 10 dialogs from a young man who tells you that A laurel will protect you from the poison marsh. Make the clues to this cryptic, and also include lore about the marsh. Also randomly talk about the history of the marsh and aesthetic things about the laurels."
+    },
+    "48": {
+      "prompt": "Generate 10 dialogs from a older man who can see that you are sickly, and asks you questions about how you feel, and also tells you to seek help from god at the church."
+    },
+    "4F": {
+      "prompt": "Generate 10 dialogs from a sickly woman who is dealing with the loss of her entire family to Dracula's creatures of the night. She knows nothing other than the town of Alba is where the monsters were headed. She will talk about her family, the monsters, the town of alba, her agony, or anything related to these subjects."
     }
   }
 }

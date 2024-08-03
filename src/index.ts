@@ -4,6 +4,8 @@ import path from 'path';
 import { prompts } from "./chatgpt/prompts";
 import dotenv from "dotenv";
 import { parseToBytes } from "./chatgpt/parse";
+import { WebSocket } from "ws";
+import http from 'http';
 
 import OpenAI from "openai";
 
@@ -42,6 +44,18 @@ const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 const app = express();
 const port = 4000;
 
+// WebSocket setup (using ws library for simplicity)
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  ws.send(JSON.stringify('Connection established'));
+});
+
 // System prompt
 const systemPrompt = prompts.system.prompt;
 
@@ -79,8 +93,41 @@ const match = regex.exec(completion.choices[0].message.content!);
   }
 }
 
+const loadActorData = async (actorID: string) => {
+  try {
+    const dialogArray = await getActorDialog(actorID);
+    if (!dialogArray) {
+      console.error(`Failed to fetch dialog for actor ${actorID}`);
+      return;
+    }
+    dialogStorage[actorID] = {
+      dialog: dialogArray,
+      dialogCounter: 0
+    };
+    saveDialogStorage(dialogStorage);
+  } catch (error) {
+    console.error(`Failed to fetch dialog for actor ${actorID}:`, error);
+  }
+}
+
+// Endpoint to get the cached dialog for all actors
+app.get("/cache", (req, res) => {
+  const actorIDs = Object.keys(prompts.actors);
+  const cachedDialogs: { [key: string]: { dialog: string[] | undefined} } = {};
+  for (const actorID of actorIDs) {
+    cachedDialogs[actorID] = dialogStorage[actorID] ?? {};
+  }
+
+  res.json(cachedDialogs);
+}
+);
+
 app.get("/dialog", async (req, res) => {
   const actorID = req.query.actorid as string;
+  if (!actorID) {
+    res.status(400).json({ message: "Actor ID is required", status: "error" });
+    return;
+  }
 
   if (!dialogStorage.hasOwnProperty(actorID) || !dialogStorage[actorID].dialog) {
     try {
@@ -143,15 +190,55 @@ app.get("/ping", (req, res) => {
   , 1000);
 });
 
+app.use(express.static('src/public'));
+
+// New endpoint to start preload
+app.post('/preload', async (req, res) => {
+  const actorsToPreload = Object.keys(prompts.actors).filter((actorID) => !dialogStorage.hasOwnProperty(actorID));
+  let loaded = 0;
+  const total = actorsToPreload.length;
+
+  console.log(`Preloading ${total} actors`);
+  console.log(actorsToPreload);
+
+  if (total === 0) {
+    res.json({ message: 'No Actors to Preload!' });
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ message: "No Actors to Preload!" }));
+      }
+    });
+    return;
+  }
+
+  for (const actorID of actorsToPreload) {
+    await loadActorData(actorID);
+    loaded++;
+    const progress = (loaded / total) * 100;
+    // Notify all connected clients
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ progress }));
+      }
+    });
+  }
+
+  // Notify completion
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ message: 'Preload complete!' }));
+    }
+  });
+
+  res.json({ message: 'Preload started' });
+});
+
 
 // Start the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
 // TODO: Implement "pre-baking" of chat prompts
 // ie. generate all chat prompts on launch and store them in dialogStorage
 // Send chat prompts on server startup
-// chatPrompts.forEach((chatPrompt) => {
-//   sendChatPrompt(chatPrompt.actorID, chatPrompt.prompt);
-// });
