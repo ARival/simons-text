@@ -134,7 +134,8 @@ select {
 
 #form-dialog-display {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -142,9 +143,12 @@ select {
   font-family: 'Castlevania II Alternate', sans-serif;
   font-size: 1rem;
   white-space: pre-line;
+  padding: 1rem;
+  border: 4px blue solid;
+  border-radius: 8px;
 }
 
 @font-face {
   font-family: Castlevania II Alternate;
-  src: url(./castlevania-ii-alternate.otf);
+  src: url(./fonts/castlevania-ii-alternate.otf);
 }
