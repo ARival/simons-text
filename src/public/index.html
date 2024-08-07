@@ -71,7 +71,7 @@
         const actorId = document.getElementById('actor-select').value;
         const actor = cachedActors[actorId];
         if (actor?.dialog) {
-          document.getElementById('form-dialog-display').innerHTML = actor.dialog.map(dialog => `<div class="form-dialog-text">${dialog}</div>`).join('');
+          document.getElementById('form-dialog-display').innerHTML = actor.dialog.map(dialog => `<div class="form-dialog-text">${dialog}<button class="form-dialog-close-button" /><img src="./images/close.svg" alt="close button" /></div>`).join('');
         } else {
           document.getElementById('form-dialog-display').innerHTML = '<div>No dialog found for this actor.</div><button>Fetch Dialog</button>';
         }

@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { parseToBytes } from "./chatgpt/parse";
 import { WebSocket } from "ws";
 import http from 'http';
+import figlet from 'figlet';
 
 import OpenAI from "openai";
 
@@ -58,8 +59,6 @@ wss.on('connection', function connection(ws) {
 
 // System prompt
 const systemPrompt = prompts.system.prompt;
-
-console.log("using system prompt");
 
 // Function to send a chat prompt to OpenAI
 // we use gpt-4o here, but other models may work.
@@ -177,19 +176,6 @@ app.get("/actors", (req, res) => {
   }
 });
 
-console.log("Sending system prompt");
-
-app.get("/ping", (req, res) => {
-  // Send a json response
-  console.debug("pinged");
-
-  // res.send("pong");
-  setTimeout(() => {
-    res.json({ message: "pong", status: "success" });
-  }
-  , 1000);
-});
-
 app.use(express.static('src/public'));
 
 // New endpoint to start preload
@@ -236,6 +222,9 @@ app.post('/preload', async (req, res) => {
 
 // Start the server
 server.listen(port, () => {
+  console.log(figlet.textSync("Simon's Text", {
+    font: 'Kban',
+  }));
   console.log(`Server is running on port ${port}`);
 });
 
