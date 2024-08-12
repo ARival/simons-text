@@ -1,91 +1,64 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Actor Preloader</title>
-    <link rel="stylesheet" href="./style.css">
-    <meta name="viewport" content="width=device-width">
-</head>
-<body>
-  <div id="app">
-    <nav id="header">
-      <div>
-        <h3>Simon's Text Admin Panel</h3>
-      </div>
-      <div>
-        <a href="https://github.com/ARival/simons-text" target="_blank"><img style="width: 1.5rem;" src="./images/github-mark-white.svg" alt="project github"/></a>
-      </div>
-    </nav>
-    <div id="main">
-      <div class="form-item form-item-max">
-        <h3 style="margin: 0">Actor Dialog Viewer</h3>
-        <select class="form-select" id="actor-select" onchange="actorChange()">
-        </select>
-        <div id="form-dialog-display">
-          Select a character to view their dialog.
+  <head>
+      <title>Actor Preloader</title>
+      <link rel="stylesheet" href="./style.css">
+      <meta name="viewport" content="width=device-width">
+  </head>
+  <body>
+    <div id="app">
+      <nav id="header">
+        <div>
+          <h3>Simon's Text Admin Panel</h3>
         </div>
-        <!-- <button id="clear-cache-button">Clear Cache</button>
-        <span id="progressText">Removes all cached dialog.</span> -->
-      </div>
-      <div class="form-item">
-        <button id="preloadButton">Preload Dialog</button>
-        <div id="preload-container">
-          <div class="progress-container">
-            <div id="progressBar"></div>
+        <div>
+          <a href="https://github.com/ARival/simons-text" target="_blank"><img style="width: 1.5rem;" src="./images/github-mark-white.svg" alt="project github"/></a>
+          <button onclick="showModal()">Modal</button>
+        </div>
+      </nav>
+      <div id="main">
+        <div class="form-item form-item-max">
+          <h3 style="margin: 0">Actor Dialog Viewer</h3>
+          <select class="form-select" id="actor-select" onchange="actorChange()" title="Actor ID">
+            <option value="">-- Actor ID --</option>
+          </select>
+          <div id="form-dialog-display">
+            Select a character to view their dialog.
           </div>
-          <span id="progressText">Preloading may take several minutes.</span>
+          <!-- <button id="clear-cache-button">Clear Cache</button>
+          <span id="progressText">Removes all cached dialog.</span> -->
         </div>
-      </div>
-      <div class="form-item">
-        <button id="clear-cache-button">Clear Cache</button>
-        <span id="progressText">Removes all cached dialog.</span>
+        <div class="form-item">
+          <button id="preloadButton">Preload Dialog</button>
+          <div id="preload-container">
+            <span id="progressText">Preloading may take several minutes.</span>
+          </div>
+        </div>
+        <div class="form-item">
+          <button id="clear-cache-button">Clear Cache</button>
+          <span id="progressText">Removes all cached dialog.</span>
+        </div>
       </div>
     </div>
-  </div>
-  <script>
-    let cachedActors = {};
-      const ws = new WebSocket('ws://localhost:4000');
-      ws.onmessage = function (event) {
-          const data = JSON.parse(event.data);
-          if (data.progress) {
-              document.getElementById('progressBar').style.width = `${data.progress}%`;
-              document.getElementById('preloadButton').setAttribute('style', `background: linear-gradient(90deg, var(--button-bg-color) ${Math.round(data.progress)}%, black ${Math.round(data.progress)}%`);
-              document.getElementById('progressText').innerText = `${Math.round(data.progress)}% completed`;
-          }
-          if (data.message) {
-              document.getElementById('progressText').innerText = data.message;
-              document.getElementById('progressBar').style.width = `100%`;
-              document.getElementById('preloadButton').setAttribute('style', `background: linear-gradient(90deg, var(--button-bg-color) 100%, black 100%`);
-          }
-      };
-
-      document.getElementById('preloadButton').addEventListener('click', () => {
-        document.getElementById('preloadButton').disabled = true;
-        document.getElementById('preloadButton').setAttribute('style', 'linear-gradient(90deg, var(--button-bg-color) 0%, black 0%');
-        document.getElementById('preload-container').setAttribute('style', 'height: auto');
-        fetch('/preload', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => console.log(data.message));
-      });
-
-      const actorChange = () => {
-        const actorId = document.getElementById('actor-select').value;
-        const actor = cachedActors[actorId];
-        if (actor?.dialog) {
-          document.getElementById('form-dialog-display').innerHTML = actor.dialog.map(dialog => `<div class="form-dialog-text">${dialog}<button class="form-dialog-close-button" /><img src="./images/close.svg" alt="close button" /></div>`).join('');
-        } else {
-          document.getElementById('form-dialog-display').innerHTML = '<div>No dialog found for this actor.</div><button>Fetch Dialog</button>';
-        }
-        // console.log(actor.dialog);
-      };
-
-      fetch('/cache', { method: 'GET' })
-          .then(response => response.json())
-          .then(data => {
-            cachedActors = data;
-            document.getElementById('actor-select').innerHTML = Object.keys(data).map(actorId => `<option value="${actorId}">${actorId}</option>`).join('');
-            console.log(data);
-            actorChange();
-          });
-  </script>
-</body>
+    <dialog id="modal">
+      <div id="modal-content">
+        <div id="modal-header">
+          <h3>Confirm Preload</h3>
+          <img src="./images/close.svg" alt="close" id="modal-close" onclick="closeModal()">
+        </div>
+        <div id="modal-body">
+          <div id="modal-progress">
+            <span id="modal-progress-text">Preloading may take several minutes.</span>
+            <div id="modal-progress-bar">
+              <div id="modal-progress-fill"></div>
+            </div>
+          </div>
+          <div id="modal-buttons">
+            <button id="modal-cancel" onclick="cancelPreload()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
 </html>

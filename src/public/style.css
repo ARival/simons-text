@@ -1,6 +1,6 @@
 :root {
     --background-color: #121212;
-    --form-bg-color: #232323;
+    --form-bg-color: #333333;
     --text-color: #E0E0E0;
     --accent-color: #BB86FC;
     --button-bg-color: #333333;
@@ -67,7 +67,8 @@ a {
   gap: 1rem;
   position: sticky;
   top: 0;
-  border-bottom: 1px var(--button-bg-color) solid;
+  border-bottom: 1px var(--form-bg-color) solid;
+  z-index: 1;
 }
 
 #main {
@@ -135,7 +136,7 @@ select {
   -moz-appearance: none;
   appearance: none;
   color: white;
-  background: url(https://stackoverflow.com/favicon.ico) 96% / 15% no-repeat var(--button-bg-color);
+  background: url('images/chevron-down.svg') 96% / 15% no-repeat var(--button-bg-color);
 }
 
 #form-dialog-display {
@@ -172,6 +173,103 @@ select {
   background: transparent;
   width: 1.5rem;
   height: 1.5rem;
+  display: none;
+}
+
+dialog[open] {
+  opacity:1;
+  transform: scale(1);
+}
+
+dialog {
+  opacity: 0;
+  transform: scale(0);
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out,
+    overlay 0.3s ease-out allow-discrete,
+    display 0.3s ease-out allow-discrete;
+  color: white;
+  border: none;
+  padding: 0;
+  background: transparent;
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0%);
+  transition:
+    display 0.3s allow-discrete,
+    overlay 0.3s allow-discrete,
+    background-color 0.3s;
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+dialog[open]::backdrop {
+  background-color: rgb(0 0 0 / 60%);
+}
+
+@starting-style {
+  dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 0%);
+  }
+}
+
+#modal-content {
+  background-color: var(--background-color);
+  padding: 0;
+  border-radius: 6px;
+  border: var(--form-bg-color) 1px solid;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#modal-header {
+  display: flex;
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  border-bottom: var(--form-bg-color) 1px solid;
+  width: 100%;
+  justify-content: center;
+}
+
+#modal-header h3 {
+  margin: 0;
+}
+
+#modal-close {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .3s ease;
+}
+
+#modal-close:hover {
+  opacity: 1;
+}
+
+#modal-body {
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 @font-face {

@@ -52,3 +52,13 @@ Got a ton of help from the folks over at the [Castlevania 2 Randomizer Project](
 ## License
 
 Simon's Text is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+{% codetabs %}
+```text
+test
+```
+
+```ts
+console.log("oh my god")
+```
+{% /codetabs %}
