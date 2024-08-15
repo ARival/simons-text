@@ -62,7 +62,7 @@ function saveDialogStorage(storage: typeof dialogStorage) {
 }
 
 // Initialize dialogStorage with data from file or as an empty object
-const dialogStorage = loadDialogStorage();
+let dialogStorage = loadDialogStorage();
 
 dotenv.config();
 
@@ -258,6 +258,17 @@ app.post('/preload', async (req, res) => {
   });
 
   res.json({ message: 'Preload started' });
+});
+
+app.post('/clear', (req, res) => {
+  dialogStorage = {};
+  saveDialogStorage({});
+  console.log('Dialog storage cleared');
+  res.json({ message: 'Dialog storage cleared' });
+});
+
+app.get('/prompts-list', (req, res) => {
+  res.json(prompts);
 });
 
 

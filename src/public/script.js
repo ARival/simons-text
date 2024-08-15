@@ -1,7 +1,14 @@
-
 let cachedActors = {};
 
 let modal = document.getElementById("modal");
+let modalTitle = document.getElementById("modal-title");
+let modalBody = document.getElementById("modal-body-text");
+let modalConfirmButton = document.getElementById("modal-confirm-button");
+let modalCancelButton = document.getElementById("modal-cancel-button");
+console.log('modalConfirmButton', modalConfirmButton);
+
+// function to confirm what will be done in the modal
+let confirmModal = () => { console.warn('No action defined for modal confirm') };
 
 const showModal = () => {
   modal.showModal();
@@ -11,14 +18,54 @@ const closeModal = () => {
   modal.close();
 }
 
+const setModalButtonsEnabled = (enabled) => {
+  modalConfirmButton.disabled = !enabled;
+  modalCancelButton.disabled = !enabled;
+  modalConfirmButton.children[1].hidden = enabled;
+  // modalCancelButton.children[1].hidden = enabled;
+}
+
+
+
+const showClearCacheModal = () => {
+  modalTitle.innerText = "Confirm Clear Cache";
+  modalBody.innerText = "Are you sure you want to clear the cache? This cannot be undone.";
+  confirmModal = () => {
+    setModalButtonsEnabled(false);
+    console.log('clearing cache...');
+    fetch("/clear", { method: "POST" }).then((response) => {
+      console.log(response);
+      getCache();
+      setModalButtonsEnabled(true);
+      closeModal();
+    });
+  }
+  // modalConfirmButton.setAttribute("onclick", "alert('hey')");
+  showModal();
+}
+
+const showRegenerateModal = () => {
+  modalTitle.innerText = "Confirm Regenerate Actor Text";
+  modalBody.innerText = "Are you sure you want to regenerate the text for this actor?";
+  confirmModal = async () => {
+    setModalButtonsEnabled(false);
+    console.log('regenerating actor text...');
+    await loadActor().then(() => {
+      setModalButtonsEnabled(true);
+      closeModal();
+    });
+  }
+  showModal();
+}
+
 const setButtonProgress = (type, progress ) => {
   document
     .getElementById(type === "preload" ? "preloadButton" : "single-load-button")
     .setAttribute(
       "style",
       `background: linear-gradient(90deg, var(--button-bg-color) ${Math.round(
-        data.progress
-      )}%, black ${Math.round(data.progress)}%`
+        progress
+      )}%, black ${Math.round(progress)}%`
     );
 }
 
@@ -26,6 +73,7 @@ const ws = new WebSocket("ws://localhost:4000");
 
 ws.onmessage = function (event) {
   const data = JSON.parse(event.data);
+  console.log(data);
   if (data.progress) {
     setButtonProgress(data.type, data.progress);
     document.getElementById("progressText").innerText = `${Math.round(
@@ -43,12 +91,19 @@ document.getElementById("preloadButton").addEventListener("click", () => {
   setButtonProgress("preload", 0);
   fetch("/preload", { method: "POST" })
     .then((response) => response.json())
-    .then((data) => console.log(data.message));
+    .then((data) => {
+      console.log(data.message);
+      getCache();
+  });
 });
 
-const loadActor= () => {
+document.getElementById("clear-cache-button").addEventListener("click", () => {
+  showClearCacheModal();
+});
+
+const loadActor = async () => {
   const actorId = document.getElementById("actor-select").value;
-  fetch("/preload", { 
+  await fetch("/preload", { 
     method: "POST", 
     headers: {
       'Content-Type': 'application/json',

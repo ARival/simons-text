@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -18,29 +19,8 @@
         </div>
       </nav>
       <div id="main">
-        <div class="form-item form-item-max">
-          <h3 style="margin: 0">Actor Dialog Viewer</h3>
-          <div id="dialog-viewer-menu">
-            <select class="form-select" id="actor-select" onchange="actorChange()" title="Actor ID">
-              <option value="">-- Actor ID --</option>
-            </select>
-            <button id="single-load-button" onclick="showRegenerateModal()"><span>Regenerate this Dialog</span><div class="loading-spinner" hidden></div></button>
-            <!-- <button id="dialog-viewer-button" onclick="showDialogViewer()"><span>View Dialog</span><div class="loading-spinner" hidden></div></button> -->
-          </div>
-          <div id="form-dialog-display">
-            Select a character to view their dialog.
-          </div>
-        </div>
-        <div class="form-item">
-          <button id="preloadButton">Preload Dialog</button>
-          <div id="preload-container">
-            <span id="progressText">Preloading may take several minutes.</span>
-          </div>
-        </div>
-        <div class="form-item">
-          <button id="clear-cache-button">Clear Cache</button>
-          <span id="progressText">Removes all cached dialog.</span>
-        </div>
+        <!-- <textarea name="prompt" id="prompt-editor-input" placeholder="Enter your prompt here..."></textarea> -->
+        <div id="prompts-container"></div>
       </div>
     </div>
     <dialog id="modal">
@@ -58,6 +38,6 @@
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
+    <script src="./script-prompts.js"></script>
   </body>
 </html>
