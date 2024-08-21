@@ -8,36 +8,12 @@
   </head>
   <body>
     <div id="app">
-      <nav id="header">
-        <div id="left-nav">
-          <a href="/"><h3>Simon's Text Admin Panel</h3></a>
-          <a href="/prompts">prompts</a>
-        </div>
-        <div id="right-nav">
-          <a href="https://github.com/ARival/simons-text" target="_blank"><img style="width: 1.5rem;" src="/images/github-mark-white.svg" alt="project github"/></a>
-          <!-- <button onclick="showModal()"><span>Modal</span><div class="loading-spinner" hidden></div></button> -->
-        </div>
-      </nav>
       <div id="main">
         <!-- <textarea name="prompt" id="prompt-editor-input" placeholder="Enter your prompt here..."></textarea> -->
+        <div id="prompts-container-system"></div>
         <div id="prompts-container"></div>
       </div>
     </div>
-    <dialog id="modal">
-      <div id="modal-content">
-        <div id="modal-header">
-          <h3 id="modal-title">Confirm Preload</h3>
-          <button id="button-modal-close" onclick="closeModal()"><img src="/images/close.svg" alt="close" id="modal-close" ></button>
-        </div>
-        <div id="modal-body">
-          <span id="modal-body-text">Preloading may take several minutes.</span>
-          <div id="modal-buttons">
-            <button id="modal-confirm-button" onclick="confirmModal()"><span>Confirm</span><div class="loading-spinner" hidden></div></button>
-            <button id="modal-cancel-button" onclick="closeModal()"><span>Cancel</span><div class="loading-spinner" hidden></div></button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script src="./script-prompts.js"></script>
+    <script type="module" src="./script-prompts.js"></script>
   </body>
 </html>

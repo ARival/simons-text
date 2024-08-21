@@ -29,19 +29,31 @@ type Prompts = {
 };
 
 const storageFilePath = path.join(__dirname, 'dialogStorage.json');
+const promptStoragePath = path.join(__dirname, 'promptstorage.json');
 const promptPath = path.join(__dirname, 'chatgpt/prompts.json');
 
 const prompts: Prompts = {}
 
 const loadPrompts = () => {
-  if (fs.existsSync(promptPath)) {
-    const fileContent = JSON.parse(readFileSync(promptPath, 'utf8'));
-    prompts.system = fileContent.system;
-    prompts.actors = fileContent.actors;
-    console.log("Prompts loaded");
-  } else {
-    console.error("Failed to load prompts. Please ensure chatgpt/prompts.json exists and is formatted correctly.");
-    exit(1);
+  try { 
+    if (fs.existsSync(promptStoragePath)) {
+      const fileContent = JSON.parse(readFileSync(promptStoragePath, 'utf8'));
+      prompts.system = fileContent.system;
+      prompts.actors = fileContent.actors;
+      console.log("Cached Prompts loaded");
+    } else if (fs.existsSync(promptPath)) {
+      const fileContent = JSON.parse(readFileSync(promptPath, 'utf8'));
+      console.log("Prompts loaded from default file.");
+      prompts.system = fileContent.system;
+      prompts.actors = fileContent.actors;
+      savePromptStorage(prompts);
+      console.log("Prompts saved to cache.");
+    } else {
+      console.error("Failed to load prompts. Please ensure chatgpt/prompts.json exists and is formatted correctly.");
+      exit(1);
+    }
+  } catch (error) {
+    console.error("Failed to load prompts:", error);
   }
 }
 
@@ -60,6 +72,21 @@ function loadDialogStorage() {
 function saveDialogStorage(storage: typeof dialogStorage) {
   fs.writeFileSync(storageFilePath, JSON.stringify(storage, null, 2), 'utf8');
 }
+
+// Function to save dialog storage
+function savePromptStorage(storage: typeof prompts) {
+  fs.writeFileSync(promptStoragePath, JSON.stringify(storage, null, 2), 'utf8');
+}
+
+const saveSinglePrompt = (actorID: string, prompt: string) => {
+  // if (!prompts.actors!.hasOwnProperty(actorID as keyof typeof prompts.actors)) {
+  //   console.error(`Actor ID ${actorID} not found in prompts`);
+  //   return;
+  // }
+  prompts.actors![actorID as keyof typeof prompts.actors].prompt = prompt;
+  savePromptStorage(prompts);
+}
+
 
 // Initialize dialogStorage with data from file or as an empty object
 let dialogStorage = loadDialogStorage();
@@ -271,6 +298,17 @@ app.get('/prompts-list', (req, res) => {
   res.json(prompts);
 });
 
+app.post('/update-prompt', (req, res) => {
+  const actorID = req.body.actorId;
+  const prompt = req.body.prompt;
+  if (!actorID || !prompt) {
+    res.status(400).json({ message: "Actor ID and prompt are required", status: "error" });
+    return;
+  }
+  saveSinglePrompt(actorID, prompt);
+  console.log(`Prompt updated for actor ${actorID}`);
+  res.json({ message: "Prompt updated", status: "success" });
+});
 
 // Start the server
 server.listen(port, () => {

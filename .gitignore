@@ -132,6 +132,7 @@ dist
 
 # dialogue cache
 src/dialogStorage.json
+src/promptstorage.json
 
 # Mac Stuff
 .DS_Store

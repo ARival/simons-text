@@ -1,3 +1,9 @@
+import { insertHeader } from "/js/components/header.js";
+import { insertModal } from "/js/components/modal.js";
+
+insertHeader();
+insertModal();
+
 let cachedActors = {};
 
 let modal = document.getElementById("modal");
@@ -8,15 +14,17 @@ let modalCancelButton = document.getElementById("modal-cancel-button");
 console.log('modalConfirmButton', modalConfirmButton);
 
 // function to confirm what will be done in the modal
-let confirmModal = () => { console.warn('No action defined for modal confirm') };
+window.confirmModal = () => { console.warn('No action defined for modal confirm') };
 
 const showModal = () => {
   modal.showModal();
 }
+window.showModal = showModal;
 
 const closeModal = () => {
   modal.close();
 }
+window.closeModal = closeModal;
 
 const setModalButtonsEnabled = (enabled) => {
   modalConfirmButton.disabled = !enabled;
@@ -26,11 +34,10 @@ const setModalButtonsEnabled = (enabled) => {
 }
 
 
-
 const showClearCacheModal = () => {
   modalTitle.innerText = "Confirm Clear Cache";
   modalBody.innerText = "Are you sure you want to clear the cache? This cannot be undone.";
-  confirmModal = () => {
+  window.confirmModal = () => {
     setModalButtonsEnabled(false);
     console.log('clearing cache...');
     fetch("/clear", { method: "POST" }).then((response) => {
@@ -44,10 +51,10 @@ const showClearCacheModal = () => {
   showModal();
 }
 
-const showRegenerateModal = () => {
+export const showRegenerateModal = () => {
   modalTitle.innerText = "Confirm Regenerate Actor Text";
   modalBody.innerText = "Are you sure you want to regenerate the text for this actor?";
-  confirmModal = async () => {
+  window.confirmModal = async () => {
     setModalButtonsEnabled(false);
     console.log('regenerating actor text...');
     await loadActor().then(() => {
@@ -57,6 +64,7 @@ const showRegenerateModal = () => {
   }
   showModal();
 }
+window.showRegenerateModal = showRegenerateModal;
 
 const setButtonProgress = (type, progress ) => {
   document
@@ -134,6 +142,8 @@ const actorChange = () => {
   }
   // console.log(actor.dialog);
 };
+
+window.actorChange = actorChange;
 
 const getCache = () => {
   fetch("/cache", { method: "GET" })
