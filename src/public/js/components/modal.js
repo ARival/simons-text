@@ -1,5 +1,11 @@
 const parser = new DOMParser();
 
+let modal;
+let modalTitle;
+let modalBody;
+let modalConfirmButton;
+let modalCancelButton;
+
 const modalHTML = /*html */`
   <dialog id="modal">
     <div id="modal-content">
@@ -18,10 +24,32 @@ const modalHTML = /*html */`
   </dialog>
 `
 
+export const setModalText = (title, description) => {
+  if (!modal || !modalTitle || !modalBody) {
+    throw error ("Modal not initialized.");
+  }
+
+  modalTitle.innerText = title;
+  modalBody.innerText = description;
+}
+
 export const insertModal = () => {
   console.log('inserting modal');
-  const modal = parser.parseFromString(modalHTML, 'text/html').body.firstChild;
+  const modalElem = parser.parseFromString(modalHTML, 'text/html').body.firstChild;
 
   const app = document.getElementById('app');
-  app.appendChild(modal);
+  app.appendChild(modalElem);
+
+  modal = document.getElementById("modal");
+  modalTitle = document.getElementById("modal-title");
+  modalBody = document.getElementById("modal-body-text");
+  modalConfirmButton = document.getElementById("modal-confirm-button");
+  modalCancelButton = document.getElementById("modal-cancel-button");
+
+  return ({
+    modal,
+    modalConfirmButton,
+    modalCancelButton,
+    setModalText
+  })
 };

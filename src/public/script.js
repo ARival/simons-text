@@ -2,16 +2,9 @@ import { insertHeader } from "/js/components/header.js";
 import { insertModal } from "/js/components/modal.js";
 
 insertHeader();
-insertModal();
+const {modal, setModalText, modalConfirmButton, modalCancelButton} = insertModal();
 
 let cachedActors = {};
-
-let modal = document.getElementById("modal");
-let modalTitle = document.getElementById("modal-title");
-let modalBody = document.getElementById("modal-body-text");
-let modalConfirmButton = document.getElementById("modal-confirm-button");
-let modalCancelButton = document.getElementById("modal-cancel-button");
-console.log('modalConfirmButton', modalConfirmButton);
 
 // function to confirm what will be done in the modal
 window.confirmModal = () => { console.warn('No action defined for modal confirm') };
@@ -35,8 +28,10 @@ const setModalButtonsEnabled = (enabled) => {
 
 
 const showClearCacheModal = () => {
-  modalTitle.innerText = "Confirm Clear Cache";
-  modalBody.innerText = "Are you sure you want to clear the cache? This cannot be undone.";
+  setModalText(
+    "Confirm Clear Cache",
+    "Are you sure you want to clear the cache? This cannot be undone."
+  )
   window.confirmModal = () => {
     setModalButtonsEnabled(false);
     console.log('clearing cache...');
@@ -52,8 +47,10 @@ const showClearCacheModal = () => {
 }
 
 export const showRegenerateModal = () => {
-  modalTitle.innerText = "Confirm Regenerate Actor Text";
-  modalBody.innerText = "Are you sure you want to regenerate the text for this actor?";
+  setModalText(
+    "Confirm Regenerate Actor Text",
+    "Are you sure you want to regenerate the text for this actor?"
+  )
   window.confirmModal = async () => {
     setModalButtonsEnabled(false);
     console.log('regenerating actor text...');
@@ -145,22 +142,37 @@ const actorChange = () => {
 
 window.actorChange = actorChange;
 
-const getCache = () => {
-  fetch("/cache", { method: "GET" })
-    .then((response) => response.json())
-    .then((data) => {
-      cachedActors = data;
-      const currentSelected = document.getElementById("actor-select").value;
-      console.log('currentSelected', currentSelected);
-      document.getElementById("actor-select").innerHTML = Object.keys(data)
-        .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
-        .join("");
-      if (currentSelected) {
-        document.getElementById("actor-select").value = currentSelected;
-      }
-      console.log(data);
-      actorChange();
-    });
+const getCache = async () => {
+  try {
+    const response = await fetch("/cache");
+    const data = await response.json();
+    cachedActors = data;
+    const currentSelected = document.getElementById("actor-select").value;
+    document.getElementById("actor-select").innerHTML = Object.keys(data)
+      .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
+      .join("");
+    if (currentSelected) {
+      document.getElementById("actor-select").value = currentSelected;
+    }
+    actorChange();
+  } catch (error) {
+    console.log(error)
+  }
+  // fetch("/cache", { method: "GET" })
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     cachedActors = data;
+  //     const currentSelected = document.getElementById("actor-select").value;
+  //     console.log('currentSelected', currentSelected);
+  //     document.getElementById("actor-select").innerHTML = Object.keys(data)
+  //       .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
+  //       .join("");
+  //     if (currentSelected) {
+  //       document.getElementById("actor-select").value = currentSelected;
+  //     }
+  //     console.log(data);
+  //     actorChange();
+  //   });
 };
 
 getCache();
