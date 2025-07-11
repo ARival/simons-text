@@ -43,6 +43,13 @@ end
 -- Uncomment this to Speed up the text display
 emu.write(0x1EE9E, 0x02, emu.memType.nesPrgRom)
 
+-- remove text sfx
+emu.write(0x1EECC, 0xEA, emu.memType.nesPrgRom)
+emu.write(0x1EECD, 0xEA, emu.memType.nesPrgRom)
+emu.write(0x1EECE, 0xEA, emu.memType.nesPrgRom)
+emu.write(0x1EECF, 0xEA, emu.memType.nesPrgRom)
+emu.write(0x1EED0, 0xEA, emu.memType.nesPrgRom)
+
 -- memory callback for when the actor id is written
 -- we store it in a global variable so we can use it later
 emu.addMemoryCallback(function (address, value)

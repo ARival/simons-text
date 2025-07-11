@@ -5,6 +5,7 @@ insertHeader();
 const {modal, setModalText, modalConfirmButton, modalCancelButton} = insertModal();
 
 let cachedActors = {};
+let soundEnabled = false;
 
 // function to confirm what will be done in the modal
 window.confirmModal = () => { console.warn('No action defined for modal confirm') };
@@ -89,6 +90,19 @@ ws.onmessage = function (event) {
     document.getElementById("progressText").innerText = data.message;
     setButtonProgress(data.type, 100);
   }
+  if (data.sound) {
+    // sound should contain the URL of the sound file
+    const audio = new Audio(data.sound);
+    audio.volume = 0.5;
+    audio.loop = false;
+    audio.onerror = (error) => {
+      console.error("Error playing sound:", error);
+    };
+    audio.onplay = () => {
+      console.log("Sound is playing");
+    };
+    audio.play();
+  }
 };
 
 document.getElementById("preloadButton").addEventListener("click", () => {
@@ -104,6 +118,25 @@ document.getElementById("preloadButton").addEventListener("click", () => {
 
 document.getElementById("clear-cache-button").addEventListener("click", () => {
   showClearCacheModal();
+});
+
+document.getElementById("enableSoundButton").addEventListener("click", (e) => {
+  soundEnabled = true;
+  document.getElementById("enableSoundButton").disabled = true;
+  fetch("/rendervoice", { 
+    method: "POST", 
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ 
+      'dialog': "here is a test rendering. I hope this works out before dracula rises."
+     })
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      // getCache();
+  });
 });
 
 const loadActor = async () => {

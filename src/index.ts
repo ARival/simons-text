@@ -1,5 +1,5 @@
 import express from "express";
-import fs, { readFileSync } from 'fs';
+import fs, { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import dotenv from "dotenv";
 import { parseToBytes } from "./chatgpt/parse";
@@ -177,6 +177,48 @@ app.get("/cache", (req, res) => {
 }
 );
 
+const renderVoice = async (dialog: string, actorID: string) => {
+  await fetch(`https://api.elevenlabs.io/v1/text-to-speech/UPZIegnxY8z2Ya7jignw`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'xi-api-key': process.env.ELEVENLABS_API_KEY as string,
+    },
+    body: JSON.stringify({
+      text: dialog,
+      voice_settings: {
+        stability: 0.75,
+        similarity_boost: 0.75
+      }
+    })
+  }).then((response) => {
+    if (!response.ok) {
+      console.error("Error:", response.statusText);
+      return null;
+    }
+    return response.arrayBuffer();
+  }).then((data) => {
+    const uuid = Math.random() * 50000000;
+    const filePath = path.join(__dirname, 'public', `${uuid}.mp3`);
+    if (data) {
+      // @ts-ignore
+      writeFileSync(filePath, Buffer.from(data));
+    } else {
+      console.error("Error: No data received to write to file.");
+      return;
+    }
+    console.log(`Rendered ${dialog}`);
+
+    const soundUrl = `/${uuid}.mp3`;
+    // Send WebSocket event with the sound URL
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ sound: soundUrl }));
+      }
+    });
+  })
+}
+
 app.get("/dialog", async (req, res) => {
   const actorID = req.query.actorid as string;
   if (!actorID) {
@@ -198,6 +240,7 @@ app.get("/dialog", async (req, res) => {
       const dialog = dialogArray[0];
       dialogStorage[actorID].dialogCounter += 1;
       res.json({ message: dialog, bytes: parseToBytes(dialog), status: "success" });
+      renderVoice(dialog, "")
       
     } catch (error) {
       console.error("Failed to fetch dialog:", error);
@@ -207,6 +250,7 @@ app.get("/dialog", async (req, res) => {
     const dialog = dialogStorage[actorID].dialog[dialogStorage[actorID].dialogCounter];
     dialogStorage[actorID].dialogCounter += 1;
     res.json({ message: dialog, bytes: parseToBytes(dialog), status: "success" });
+    renderVoice(dialog, "")
     if (dialogStorage[actorID].dialogCounter >= dialogStorage[actorID].dialog.length) {
       dialogStorage[actorID].dialogCounter = 0;
       const dialogArray = await getActorDialog(actorID);
@@ -234,7 +278,57 @@ app.get("/actors", (req, res) => {
 
 app.use(express.static('src/public'));
 
-// New endpoint to start preload
+
+app.post('/rendervoice', async (req, res) => {
+  const dialog = req.body.dialog;
+  const actorID = req.body.actorId;
+  await fetch(`https://api.elevenlabs.io/v1/text-to-speech/WkTeLhuefA5F7XmW468S`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'xi-api-key': process.env.ELEVENLABS_API_KEY as string,
+    },
+    body: JSON.stringify({
+      text: dialog,
+      voice_settings: {
+        stability: 0.75,
+        similarity_boost: 0.75
+      }
+    })
+  }).then((response) => {
+    if (!response.ok) {
+      console.error("Error:", response.statusText);
+      res.status(500).json({ message: "Failed to fetch voice", status: "error" });
+      return;
+    }
+    return response.arrayBuffer();
+  }).then((data) => {
+    const filePath = path.join(__dirname, 'public', 'speech.mp3');
+    if (data) {
+      // @ts-ignore
+      writeFileSync(filePath, Buffer.from(data));
+    } else {
+      console.error("Error: No data received to write to file.");
+      res.status(500).json({ message: "No data received", status: "error" });
+      return;
+    }
+    console.log("Voice data saved to speech.mp3");
+
+    const soundUrl = '/speech.mp3';
+    // Send WebSocket event with the sound URL
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ sound: soundUrl }));
+      }
+    });
+
+    res.json({ message: "Voice rendered and saved", status: "success", filePath: soundUrl });
+  }).catch((error) => {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Failed to fetch voice", status: "error" });
+  });
+});
+
 app.post('/preload', async (req, res) => {
   let isPreload= true;
   let actorsToPreload: string[]; 
