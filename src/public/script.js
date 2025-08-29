@@ -1,50 +1,64 @@
+import van from "./van-1.5.5.min.js";
 import { insertHeader } from "/js/components/header.js";
-import { insertModal } from "/js/components/modal.js";
-
+import { insertModal, setModalText, setModalButtonsEnabled, showModal, closeModal } from "/js/components/modal.js";
 insertHeader();
-const {modal, setModalText, modalConfirmButton, modalCancelButton} = insertModal();
 
-let cachedActors = {};
-let soundEnabled = false;
+const { div, button, span, h3, select, option } = van.tags;
+
+const {modal, modalConfirmButton, modalCancelButton} = insertModal();
+
+// Reactive state
+const appState = van.state({
+  cachedActors: {},
+  soundEnabled: false,
+  selectedActor: "",
+  progressText: "Clicking this will enable sound through the browser",
+  preloadProgress: 0,
+  singleLoadProgress: 0
+});
 
 // function to confirm what will be done in the modal
 window.confirmModal = () => { console.warn('No action defined for modal confirm') };
 
-const showModal = () => {
-  modal.showModal();
+const setButtonProgress = (type, progress) => {
+  const buttonId = type === "preload" ? "preloadButton" : "single-load-button";
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.setAttribute(
+      "style",
+      `background: linear-gradient(90deg, var(--button-bg-color) ${Math.round(
+        progress
+      )}%, black ${Math.round(progress)}%`
+    );
+  }
+  
+  if (type === "preload") {
+    appState.val = { ...appState.val, preloadProgress: progress };
+  } else {
+    appState.val = { ...appState.val, singleLoadProgress: progress };
+  }
 }
-window.showModal = showModal;
-
-const closeModal = () => {
-  modal.close();
-}
-window.closeModal = closeModal;
-
-const setModalButtonsEnabled = (enabled) => {
-  modalConfirmButton.disabled = !enabled;
-  modalCancelButton.disabled = !enabled;
-  modalConfirmButton.children[1].hidden = enabled;
-  // modalCancelButton.children[1].hidden = enabled;
-}
-
 
 const showClearCacheModal = () => {
   setModalText(
     "Confirm Clear Cache",
     "Are you sure you want to clear the cache? This cannot be undone."
   )
-  window.confirmModal = () => {
+  
+  const confirmAction = async () => {
     setModalButtonsEnabled(false);
     console.log('clearing cache...');
-    fetch("/clear", { method: "POST" }).then((response) => {
+    try {
+      const response = await fetch("/clear", { method: "POST" });
       console.log(response);
-      getCache();
+      await getCache();
+    } finally {
       setModalButtonsEnabled(true);
       closeModal();
-    });
-  }
-  // modalConfirmButton.setAttribute("onclick", "alert('hey')");
-  showModal();
+    }
+  };
+  
+  showModal(confirmAction);
 }
 
 export const showRegenerateModal = () => {
@@ -52,28 +66,21 @@ export const showRegenerateModal = () => {
     "Confirm Regenerate Actor Text",
     "Are you sure you want to regenerate the text for this actor?"
   )
-  window.confirmModal = async () => {
+  
+  const confirmAction = async () => {
     setModalButtonsEnabled(false);
     console.log('regenerating actor text...');
-    await loadActor().then(() => {
+    try {
+      await loadActor();
+    } finally {
       setModalButtonsEnabled(true);
       closeModal();
-    });
-  }
-  showModal();
+    }
+  };
+  
+  showModal(confirmAction);
 }
 window.showRegenerateModal = showRegenerateModal;
-
-const setButtonProgress = (type, progress ) => {
-  document
-    .getElementById(type === "preload" ? "preloadButton" : "single-load-button")
-    .setAttribute(
-      "style",
-      `background: linear-gradient(90deg, var(--button-bg-color) ${Math.round(
-        progress
-      )}%, black ${Math.round(progress)}%`
-    );
-}
 
 const ws = new WebSocket("ws://localhost:4000");
 
@@ -82,12 +89,22 @@ ws.onmessage = function (event) {
   console.log(data);
   if (data.progress) {
     setButtonProgress(data.type, data.progress);
-    document.getElementById("progressText").innerText = `${Math.round(
-      data.progress
-    )}% completed`;
+    appState.val = { 
+      ...appState.val, 
+      progressText: `${Math.round(data.progress)}% completed` 
+    };
+    // Update progress text display
+    const progressElements = document.querySelectorAll("#progressText");
+    progressElements.forEach(el => {
+      el.innerText = appState.val.progressText;
+    });
   }
   if (data.message) {
-    document.getElementById("progressText").innerText = data.message;
+    appState.val = { ...appState.val, progressText: data.message };
+    const progressElements = document.querySelectorAll("#progressText");
+    progressElements.forEach(el => {
+      el.innerText = data.message;
+    });
     setButtonProgress(data.type, 100);
   }
   if (data.sound) {
@@ -105,7 +122,7 @@ ws.onmessage = function (event) {
   }
 };
 
-document.getElementById("preloadButton").addEventListener("click", () => {
+const handlePreload = () => {
   document.getElementById("preloadButton").disabled = true;
   setButtonProgress("preload", 0);
   fetch("/preload", { method: "POST" })
@@ -114,14 +131,14 @@ document.getElementById("preloadButton").addEventListener("click", () => {
       console.log(data.message);
       getCache();
   });
-});
+};
 
-document.getElementById("clear-cache-button").addEventListener("click", () => {
+const handleClearCache = () => {
   showClearCacheModal();
-});
+};
 
-document.getElementById("enableSoundButton").addEventListener("click", (e) => {
-  soundEnabled = true;
+const handleEnableSound = (e) => {
+  appState.val = { ...appState.val, soundEnabled: true };
   document.getElementById("enableSoundButton").disabled = true;
   fetch("/rendervoice", { 
     method: "POST", 
@@ -135,12 +152,11 @@ document.getElementById("enableSoundButton").addEventListener("click", (e) => {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      // getCache();
   });
-});
+};
 
 const loadActor = async () => {
-  const actorId = document.getElementById("actor-select").value;
+  const actorId = appState.val.selectedActor;
   await fetch("/preload", { 
     method: "POST", 
     headers: {
@@ -157,55 +173,61 @@ const loadActor = async () => {
 }
 
 const actorChange = () => {
-  const actorId = document.getElementById("actor-select").value;
-  const actor = cachedActors[actorId];
+  const actorSelect = document.getElementById("actor-select");
+  const actorId = actorSelect.value;
+  appState.val = { ...appState.val, selectedActor: actorId };
+  
+  const actor = appState.val.cachedActors[actorId];
+  const dialogDisplay = document.getElementById("form-dialog-display");
+  
   if (actor?.dialog) {
-    document.getElementById("form-dialog-display").innerHTML = actor.dialog
+    dialogDisplay.innerHTML = actor.dialog
       .map(
         (dialog) =>
           `<div class="form-dialog-text">${dialog}<button class="form-dialog-close-button" /><img src="./images/close.svg" alt="close button" /></div>`
       )
       .join("");
   } else {
-    document.getElementById("form-dialog-display").innerHTML =
+    dialogDisplay.innerHTML =
       "<div>No dialog found for this actor.</div><button id='single-load-button' onclick='loadActor()'>Fetch Dialog</button>";
   }
-  // console.log(actor.dialog);
 };
 
 window.actorChange = actorChange;
+window.loadActor = loadActor;
 
 const getCache = async () => {
   try {
     const response = await fetch("/cache");
     const data = await response.json();
-    cachedActors = data;
-    const currentSelected = document.getElementById("actor-select").value;
-    document.getElementById("actor-select").innerHTML = Object.keys(data)
-      .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
-      .join("");
-    if (currentSelected) {
-      document.getElementById("actor-select").value = currentSelected;
+    appState.val = { ...appState.val, cachedActors: data };
+    
+    const currentSelected = appState.val.selectedActor;
+    const actorSelect = document.getElementById("actor-select");
+    
+    if (actorSelect) {
+      actorSelect.innerHTML = Object.keys(data)
+        .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
+        .join("");
+      if (currentSelected) {
+        actorSelect.value = currentSelected;
+      }
     }
     actorChange();
   } catch (error) {
     console.log(error)
   }
-  // fetch("/cache", { method: "GET" })
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     cachedActors = data;
-  //     const currentSelected = document.getElementById("actor-select").value;
-  //     console.log('currentSelected', currentSelected);
-  //     document.getElementById("actor-select").innerHTML = Object.keys(data)
-  //       .map((actorId) => `<option value="${actorId}">${actorId}</option>`)
-  //       .join("");
-  //     if (currentSelected) {
-  //       document.getElementById("actor-select").value = currentSelected;
-  //     }
-  //     console.log(data);
-  //     actorChange();
-  //   });
 };
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const preloadButton = document.getElementById("preloadButton");
+  const clearCacheButton = document.getElementById("clear-cache-button");
+  const enableSoundButton = document.getElementById("enableSoundButton");
+  
+  if (preloadButton) preloadButton.addEventListener("click", handlePreload);
+  if (clearCacheButton) clearCacheButton.addEventListener("click", handleClearCache);
+  if (enableSoundButton) enableSoundButton.addEventListener("click", handleEnableSound);
+});
 
 getCache();

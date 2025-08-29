@@ -2,16 +2,73 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <title>Actor Preloader</title>
+      <title>Actor Preloader - Prompts</title>
       <link rel="stylesheet" href="/style.css">
-      <meta name="viewport" content="width=device-width">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Manage actor prompts and system configurations">
   </head>
   <body>
     <div id="app">
       <div id="main">
-        <!-- <textarea name="prompt" id="prompt-editor-input" placeholder="Enter your prompt here..."></textarea> -->
-        <div id="prompts-container-system"></div>
-        <div id="prompts-container"></div>
+        <div class="prompts-page">
+          <div class="prompts-header">
+            <div class="prompts-title-section">
+              <h1 class="prompts-title">Actor Prompts</h1>
+              <p class="prompts-subtitle">Configure AI behavior and personality for each character type</p>
+            </div>
+                         <div class="prompts-controls btn-group">
+               <div class="search-container">
+                 <input 
+                   type="text" 
+                   id="prompt-search" 
+                   placeholder="Search prompts..." 
+                   class="search-input"
+                   aria-label="Search prompts"
+                 >
+                 <div class="search-icon">🔍</div>
+               </div>
+               <button id="save-all-button" class="btn-primary" disabled>
+                 <span>Save All Changes</span>
+               </button>
+             </div>
+          </div>
+
+          <div class="system-prompt-section">
+            <div class="section-header">
+              <h2 class="section-title">System Prompt</h2>
+              <span class="section-description">Global instructions that apply to all actors</span>
+            </div>
+            <div class="system-prompt-container">
+                             <textarea 
+                 id="system-prompt-textarea" 
+                 class="system-prompt-textarea"
+                 placeholder="Enter system prompt..."
+                 aria-label="System prompt"
+               ></textarea>
+               <button class="btn-icon prompt-save-button" hidden aria-label="Save system prompt">
+                 <img src="/images/save.svg" alt="Save">
+               </button>
+            </div>
+          </div>
+
+          <div class="actor-prompts-section">
+            <div class="section-header">
+              <h2 class="section-title">Actor Prompts</h2>
+              <span class="section-description">Individual character configurations</span>
+              <div class="prompts-stats">
+                <span id="prompts-count">0 actors</span>
+                <span id="unsaved-changes" class="unsaved-indicator" hidden>• Unsaved changes</span>
+              </div>
+            </div>
+            <div id="prompts-container" class="prompts-grid"></div>
+          </div>
+
+          <div id="empty-state" class="empty-state" hidden>
+            <div class="empty-state-icon">🎭</div>
+            <h3>No Actor Prompts Found</h3>
+            <p>Actor prompts will appear here once they're loaded from the server.</p>
+          </div>
+        </div>
       </div>
     </div>
     <script type="module" src="./script-prompts.js"></script>

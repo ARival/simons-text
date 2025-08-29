@@ -1,21 +1,34 @@
-const parser = new DOMParser();
+import van from "../../van-1.5.5.min.js";
 
-export const insertHeader = (activeMenu) => 
-{
-  const header = parser.parseFromString(/* html */ `
-    <nav id="header">
-      <div id="left-nav">
-        <a href="/"><span id="nav-logo">ST</span></a>
-        <a class="${activeMenu === "prompt" ? "nav-selected" : ""}" href="/prompts">prompts</a>
-      </div>
-      <div id="right-nav">
-        <a href="https://github.com/ARival/simons-text" target="_blank"><img style="width: 1.5rem;" src="/images/github-mark-white.svg" alt="project github"/></a>
-        <!-- <button onclick="showModal()"><span>Modal</span><div class="loading-spinner" hidden></div></button> -->
-      </div>
-    </nav>
-  `, 'text/html').body.firstChild;
+const { nav, div, a, span, img } = van.tags;
 
+export const createHeader = (activeMenu = "") => {
+  return nav({ id: "header" },
+    div({ id: "left-nav" },
+      a({ href: "/" }, span({ id: "nav-logo" }, "ST")),
+      a({ 
+        class: activeMenu === "prompt" ? "nav-selected" : "",
+        href: "/prompts" 
+      }, "prompts")
+    ),
+    div({ id: "right-nav" },
+      a({ 
+        href: "https://github.com/ARival/simons-text", 
+        target: "_blank" 
+      }, 
+        img({ 
+          style: "width: 1.5rem;", 
+          src: "/images/github-mark-white.svg", 
+          alt: "project github" 
+        })
+      )
+    )
+  );
+};
+
+export const insertHeader = (activeMenu) => {
   const app = document.getElementById('app');
+  const header = createHeader(activeMenu);
+  // Insert header at the beginning instead of the end
   app.insertBefore(header, app.firstChild);
-
-}
+};

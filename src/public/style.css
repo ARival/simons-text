@@ -24,34 +24,71 @@ body {
     height: 100vh;
 }
 
+/* 
+ * BUTTON SYSTEM
+ * 
+ * Base button styles apply to all buttons automatically.
+ * Use these modifier classes for different button types:
+ * 
+ * .btn-primary     - Main call-to-action buttons (gradient background)
+ * .btn-secondary   - Secondary actions (outlined style)
+ * .btn-danger      - Destructive actions (red background)
+ * .btn-icon        - Small icon-only buttons
+ * .btn-small       - Compact buttons
+ * .btn-large       - Prominent buttons
+ * 
+ * Utility classes:
+ * .btn-group       - Container for button groups
+ * .btn-with-spinner - Buttons with loading states
+ * .btn-has-changes - Visual indicator for unsaved changes
+ * 
+ * Legacy classes (.primary-button, etc.) are maintained for compatibility
+ */
+
+/* Base Button Styles */
 button {
   background-color: var(--button-bg-color);
   color: var(--button-text-color);
   border: none;
-  padding: 10px 20px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: background-color 0.1s ease;
-  border-radius: 5px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
   font-weight: 500;
+  font-size: 1rem;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  font-family: inherit;
 }
 
-button:hover {
-    background-color: var(--accent-color);
-}
-
-button:focus-visible:not(:hover) {
-  background-color: var(--accent-color-darker);
-}
-
-button:disabled {
-    background-color: var(--form-bg-color);
-    color: var(--button-disabled-text-color);
-    cursor: not-allowed;
+button:hover:not(:disabled) {
+  background-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 button:focus-visible {
-  outline: white 1px solid;
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  background-color: var(--accent-color-darker);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled {
+  background-color: var(--form-bg-color);
+  color: var(--button-disabled-text-color);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
 }
 
 a {
@@ -218,12 +255,26 @@ select:focus-visible {
   top: 0.5rem;
   right: 0.5rem;
   margin: 0;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
+  padding: 0.25rem;
+  background: rgba(0, 0, 0, 0.5);
   width: 1.5rem;
   height: 1.5rem;
+  min-height: 1.5rem;
+  border-radius: 4px;
   display: none;
+  transition: all 0.2s ease;
+}
+
+.form-dialog-close-button:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.8);
+  transform: none; /* Override base button transform */
+  box-shadow: none;
+}
+
+.form-dialog-close-button img {
+  width: 1rem;
+  height: 1rem;
+  filter: brightness(0) invert(1);
 }
 
 #dialog-viewer-menu {
@@ -314,16 +365,60 @@ dialog[open]::backdrop {
   background-color: transparent;
 }
 
-#modal-close {
+/* Modal specific button styles */
+#button-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: transparent;
+  min-height: 2rem;
   width: 2rem;
-  height: 2rem;
-  cursor: pointer;
-  opacity: .6;
-  transition: opacity .3s ease;
+  border-radius: 6px;
+}
+
+#button-modal-close:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  transform: none; /* Override base button transform */
+}
+
+#modal-close {
+  width: 1.5rem;
+  height: 1.5rem;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
 }
 
 #modal-close:hover {
   opacity: 1;
+}
+
+#modal-confirm-button {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 600;
+}
+
+#modal-confirm-button:hover:not(:disabled) {
+  background: var(--accent-color-darker);
+}
+
+#modal-cancel-button {
+  background: var(--form-bg-color);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#modal-cancel-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+#modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
 }
 
 #modal-body {
@@ -424,17 +519,28 @@ dialog[open]::backdrop {
   font-size: 14px;
 }
 
+/* Legacy save button - now uses consistent styling */
 .form-prompt-save-button {
   position: absolute;
-  bottom: .5rem;
-  right: .5rem;
-  padding: .25rem;
-  display: flex;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: var(--accent-color);
+  border-radius: 6px;
+  min-height: 2rem;
+  width: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form-prompt-save-button:hover:not(:disabled) {
+  background: var(--accent-color-darker);
+  transform: scale(1.05);
 }
 
 .form-prompt-save-button > img {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  filter: brightness(0) invert(1);
 }
 
 
@@ -476,6 +582,520 @@ textarea:hover:not(:focus) {
   outline: 1px var(--accent-color) solid;
 }
 
+/* Modern Prompts Page Styles */
+.prompts-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 56px);
+}
+
+.prompts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  gap: 2rem;
+}
+
+.prompts-title-section {
+  flex: 1;
+}
+
+.prompts-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.prompts-subtitle {
+  font-size: 1.1rem;
+  color: var(--button-disabled-text-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.prompts-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border: 1px solid var(--form-bg-color);
+  border-radius: 8px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  width: 280px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--button-disabled-text-color);
+}
+
+.search-icon {
+  position: absolute;
+  right: 1rem;
+  color: var(--button-disabled-text-color);
+  pointer-events: none;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-color-darker);
+  box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
+}
+
+.btn-primary:focus-visible {
+  outline-color: white;
+  background: var(--accent-color-darker);
+}
+
+.btn-secondary {
+  background-color: var(--form-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--accent-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  min-height: 2rem;
+  width: 2rem;
+  border-radius: 6px;
+}
+
+.btn-icon img {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  min-height: 2rem;
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  min-height: 3rem;
+}
+
+/* Legacy support - map old classes to new system */
+.primary-button {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 600;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--accent-color-darker);
+  box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
+}
+
+.primary-button:disabled {
+  background: var(--form-bg-color);
+  color: var(--button-disabled-text-color);
+  opacity: 0.6;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.section-description {
+  color: var(--button-disabled-text-color);
+  font-size: 0.9rem;
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.prompts-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--button-disabled-text-color);
+}
+
+.unsaved-indicator {
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+.system-prompt-section {
+  background: rgba(51, 51, 51, 0.3);
+  border: 1px solid var(--form-bg-color);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+}
+
+.system-prompt-container {
+  position: relative;
+}
+
+.system-prompt-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: 1px solid var(--form-bg-color);
+  border-radius: 8px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.system-prompt-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.1);
+}
+
+.actor-prompts-section {
+  margin-bottom: 2rem;
+}
+
+.prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-prompt-container {
+  background: rgba(51, 51, 51, 0.2);
+  border: 1px solid var(--form-bg-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-prompt-container:hover {
+  border-color: rgba(187, 134, 252, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.form-prompt-container.has-changes {
+  border-color: #ff6b6b;
+}
+
+.form-prompt-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-prompt-title {
+  flex: 1;
+}
+
+.form-prompt-address {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.form-prompt-actor-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-transform: capitalize;
+  margin-top: 0.25rem;
+}
+
+.form-prompt-image-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-color-darker));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.form-prompt-image-container > img {
+  object-fit: none;
+  position: relative;
+  margin-top: 8px;
+  margin-left: -3px;
+}
+
+.form-prompt-textarea-container {
+  position: relative;
+}
+
+.form-prompt-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 1rem;
+  border: 1px solid rgba(51, 51, 51, 0.8);
+  border-radius: 8px;
+  background-color: rgba(18, 18, 18, 0.8);
+  color: var(--text-color);
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.form-prompt-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background-color: var(--background-color);
+  box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.1);
+}
+
+.prompt-save-button {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: var(--accent-color);
+  border-radius: 6px;
+  padding: 0.5rem;
+  min-height: 2rem;
+  width: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.prompt-save-button:hover:not(:disabled) {
+  background: var(--accent-color-darker);
+  transform: scale(1.05);
+}
+
+.prompt-save-button img {
+  width: 1.2rem;
+  height: 1.2rem;
+  filter: brightness(0) invert(1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--button-disabled-text-color);
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: var(--text-color);
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.nav-selected {
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .prompts-page {
+    padding: 1rem;
+  }
+  
+  .prompts-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  
+  .prompts-controls {
+    justify-content: stretch;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .prompts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section-description {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .prompts-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-prompt-container {
+    padding: 1rem;
+  }
+  
+  .form-prompt-textarea {
+    min-height: 150px;
+  }
+  
+  .system-prompt-section {
+    padding: 1.5rem;
+  }
+}
+
+/* Button Utilities */
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-with-spinner {
+  position: relative;
+}
+
+.btn-with-spinner .loading-spinner {
+  /* Position spinner next to text, not overlapping */
+  margin-left: 0.5rem;
+}
+
+.btn-with-spinner:disabled .loading-spinner {
+  display: block;
+}
+
+.btn-with-spinner:not(:disabled) .loading-spinner {
+  display: none;
+}
+
+/* Keep text visible when disabled, just show spinner alongside */
+.btn-with-spinner:disabled span {
+  opacity: 1;
+}
+
+/* Button state indicators */
+.btn-has-changes {
+  position: relative;
+}
+
+.btn-has-changes::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  border: 2px solid var(--background-color);
+}
+
+/* Responsive button adjustments */
+@media (max-width: 768px) {
+  button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-large {
+    padding: 0.8rem 1.6rem;
+    font-size: 1rem;
+  }
+  
+  .btn-group {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn-group button {
+    width: 100%;
+  }
+}
+
+/* Legacy prompts container for backwards compatibility */
 #prompts-container {
   display: flex;
   flex-direction: column;

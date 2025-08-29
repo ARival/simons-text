@@ -1,55 +1,117 @@
-const parser = new DOMParser();
+import van from "../../van-1.5.5.min.js";
 
-let modal;
-let modalTitle;
-let modalBody;
-let modalConfirmButton;
-let modalCancelButton;
+const { dialog, div, h3, button, span, img } = van.tags;
 
-const modalHTML = /*html */`
-  <dialog id="modal">
-    <div id="modal-content">
-      <div id="modal-header">
-        <h3 id="modal-title">Confirm Preload</h3>
-        <button id="button-modal-close" onclick="closeModal()"><img src="/images/close.svg" alt="close" id="modal-close" ></button>
-      </div>
-      <div id="modal-body">
-        <span id="modal-body-text">Preloading may take several minutes.</span>
-        <div id="modal-buttons">
-          <button id="modal-confirm-button" onclick="confirmModal()"><span>Confirm</span><div class="loading-spinner" hidden></div></button>
-          <button id="modal-cancel-button" onclick="closeModal()"><span>Cancel</span><div class="loading-spinner" hidden></div></button>
-        </div>
-      </div>
-    </div>
-  </dialog>
-`
+// Reactive state
+const modalState = van.state({
+  isOpen: false,
+  title: "Confirm",
+  bodyText: "Are you sure?",
+  confirmAction: () => {},
+  buttonsDisabled: false
+});
+
+let modalElement;
 
 export const setModalText = (title, description) => {
-  if (!modal || !modalTitle || !modalBody) {
-    throw error ("Modal not initialized.");
-  }
+  modalState.val = {
+    ...modalState.val,
+    title,
+    bodyText: description
+  };
+};
 
-  modalTitle.innerText = title;
-  modalBody.innerText = description;
-}
+export const setModalButtonsEnabled = (enabled) => {
+  modalState.val = {
+    ...modalState.val,
+    buttonsDisabled: !enabled
+  };
+};
+
+export const showModal = (confirmAction = null) => {
+  if (confirmAction) {
+    modalState.val = {
+      ...modalState.val,
+      confirmAction
+    };
+  }
+  modalState.val = { ...modalState.val, isOpen: true };
+  modalElement?.showModal();
+};
+
+export const closeModal = () => {
+  modalState.val = { ...modalState.val, isOpen: false };
+  modalElement?.close();
+};
+
+const handleConfirm = async () => {
+  if (modalState.val.confirmAction) {
+    await modalState.val.confirmAction();
+  }
+};
+
+export const createModal = () => {
+  const modal = dialog({ id: "modal" },
+    div({ id: "modal-content" },
+      div({ id: "modal-header" },
+        h3({ id: "modal-title" }, () => modalState.val.title),
+        button({ 
+          id: "button-modal-close",
+          class: "btn-icon",
+          onclick: closeModal 
+        }, 
+          img({ src: "/images/close.svg", alt: "close", id: "modal-close" })
+        )
+      ),
+      div({ id: "modal-body" },
+        span({ id: "modal-body-text" }, () => modalState.val.bodyText),
+        div({ id: "modal-buttons" },
+          button({ 
+            id: "modal-confirm-button",
+            class: "btn-primary btn-with-spinner",
+            onclick: handleConfirm,
+            disabled: () => modalState.val.buttonsDisabled
+          }, 
+            span("Confirm"),
+            div({ class: "loading-spinner", hidden: () => !modalState.val.buttonsDisabled })
+          ),
+          button({ 
+            id: "modal-cancel-button",
+            class: "btn-secondary",
+            onclick: closeModal,
+            disabled: () => modalState.val.buttonsDisabled
+          }, 
+            span("Cancel")
+          )
+        )
+      )
+    )
+  );
+  
+  return modal;
+};
 
 export const insertModal = () => {
-  console.log('inserting modal');
-  const modalElem = parser.parseFromString(modalHTML, 'text/html').body.firstChild;
-
   const app = document.getElementById('app');
-  app.appendChild(modalElem);
+  modalElement = createModal();
+  van.add(app, modalElement);
 
-  modal = document.getElementById("modal");
-  modalTitle = document.getElementById("modal-title");
-  modalBody = document.getElementById("modal-body-text");
-  modalConfirmButton = document.getElementById("modal-confirm-button");
-  modalCancelButton = document.getElementById("modal-cancel-button");
+  // For backward compatibility, attach to window
+  window.confirmModal = () => {
+    if (modalState.val.confirmAction) {
+      modalState.val.confirmAction();
+    }
+  };
+  window.showModal = showModal;
+  window.closeModal = closeModal;
 
-  return ({
-    modal,
-    modalConfirmButton,
-    modalCancelButton,
-    setModalText
-  })
+  return {
+    modal: modalElement,
+    modalConfirmButton: modalElement.querySelector('#modal-confirm-button'),
+    modalCancelButton: modalElement.querySelector('#modal-cancel-button'),
+    setModalText,
+    setModalButtonsEnabled,
+    showModal,
+    closeModal
+  };
 };
